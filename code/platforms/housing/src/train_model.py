@@ -32,48 +32,50 @@ def get_experiment_id(experiment_name):
     return exp_id
 
 # mlflow client
-client = MlflowClient()
-run = client.create_run(get_experiment_id(experiment_name)) # run Start:
+# client = MlflowClient()
+# run = client.create_run(get_experiment_id(experiment_name)) # run Start:
 
 # Get system arguments
-train_datafile, test_datafile = sys.argv[1],sys.argv[2] if len(sys.argv) > 2 else print(" No input for train and test files")
 
-train_df = pd.read_csv(train_datafile,sep=",")
-test_df = pd.read_csv(test_datafile)
+with mlflow.start_run():
+    train_datafile, test_datafile = sys.argv[1],sys.argv[2] if len(sys.argv) > 2 else print(" No input for train and test files")
 
-X_train = train_df.iloc[:,0:-1].values
-y_train= np.array(train_df.iloc[:,-1])
+    train_df = pd.read_csv(train_datafile,sep=",")
+    test_df = pd.read_csv(test_datafile)
 
-X_test = test_df.iloc[:,0:-1].values
-y_test = np.array(test_df.iloc[:,-1])
+    X_train = train_df.iloc[:,0:-1].values
+    y_train= np.array(train_df.iloc[:,-1])
 
-# Parameters
-n_estimators = 5
-random_state = 100
-min_samples_leaf = 5
-regressor = RandomForestRegressor(n_estimators = n_estimators, random_state = random_state, min_samples_leaf=min_samples_leaf)
+    X_test = test_df.iloc[:,0:-1].values
+    y_test = np.array(test_df.iloc[:,-1])
 
-regressor.fit(X_train,y_train)
+    # Parameters
+    n_estimators = 5
+    random_state = 100
+    min_samples_leaf = 5
+    regressor = RandomForestRegressor(n_estimators = n_estimators, random_state = random_state, min_samples_leaf=min_samples_leaf)
 
-y_pred = regressor.predict(X_test)
+    regressor.fit(X_train,y_train)
 
-mae =  metrics.mean_absolute_error(y_test, y_pred)
-mse = metrics.mean_squared_error(y_test, y_pred) 
-rmse = np.sqrt(metrics.mean_squared_error(y_test, y_pred))
+    y_pred = regressor.predict(X_test)
 
-# Normal approach
-print('Mean Absolute Error:', mae)  
-print('Mean Squared Error:', mse)  
-print('Root Mean Squared Error:', rmse)
+    mae =  metrics.mean_absolute_error(y_test, y_pred)
+    mse = metrics.mean_squared_error(y_test, y_pred) 
+    rmse = np.sqrt(metrics.mean_squared_error(y_test, y_pred))
 
-# log parameters
-client.log_param(run.info.run_id,"n_estimators",n_estimators)
-client.log_param(run.info.run_id,"random_state",random_state)
-client.log_param(run.info.run_id,"min_samples_leaf",min_samples_leaf)
+    # Normal approach
+    print('Mean Absolute Error:', mae)  
+    print('Mean Squared Error:', mse)  
+    print('Root Mean Squared Error:', rmse)
 
-# log metrics
-client.log_metric(run.info.run_id,"mae",mae)
-client.log_metric(run.info.run_id,"mse",mse)
-client.log_metric(run.info.run_id,"rmse",rmse)
+    # log parameters
+    mlflow.log_param(key="n_estimators",value=n_estimators)
+    mlflow.log_param(key = "random_state", value=random_state)
+    mlflow.log_param(key="min_samples_leaf",value=min_samples_leaf)
 
-client.set_terminated(run.info.run_id) # Run end
+    # log metrics
+    mlflow.log_metric(key="mae",value=mae)
+    mlflow.log_metric(key="mse",value=mse)
+    mlflow.log_metric(key="rmse",value=rmse)
+
+# client.set_terminated(run.info.run_id) 

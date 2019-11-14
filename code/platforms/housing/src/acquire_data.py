@@ -20,6 +20,10 @@ def download_file(file_name):
     else:    
         print("File found!")
         print("Downloading file ....")  
+
+        if not os.path.exists(file_location+"./data/raw/"):
+            os.makedirs(file_location+"./data/raw/")
+
         copyfile(file_location,"./data/raw/"+str(file_name)) 
         print("File download complete.") 
 

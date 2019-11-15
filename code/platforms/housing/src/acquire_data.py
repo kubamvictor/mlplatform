@@ -21,8 +21,9 @@ def download_file(file_name):
         print("File found!")
         print("Downloading file ....")  
 
-        if not os.path.exists(file_location+"./data/raw/"):
-            os.makedirs(file_location+"./data/raw/")
+        if not os.path.exists("./data/raw/"):
+            print("creating data/raw directory")
+            os.makedirs("./data/raw/")
 
         copyfile(file_location,"./data/raw/"+str(file_name)) 
         print("File download complete.") 

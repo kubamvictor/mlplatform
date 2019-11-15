@@ -1,0 +1,14 @@
+name: MLPlatforms
+
+conda_env: my_env.yaml
+
+entry_points:
+    main:
+        parameters:
+            train_data: 
+                type: path
+                default: "data/splitter/train.csv"    
+            test_data: 
+                type: path
+                default: "data/splitter/test.csv"
+        command: "python train_model.py --train_data {train_data} --test_data {test_data}"

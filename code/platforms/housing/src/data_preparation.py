@@ -18,8 +18,9 @@ def get_cmd_args():
 
 def write_data(table, filename):
     if not os.path.exists('./data/splitter'):
+        print("creating data/splitter directory")
         os.makedirs('./data/splitter')
-        
+
     print("Writing to ./data/splitter/{}".format(filename))
     table.to_csv('./data/splitter/' + filename, index=False,sep=",")
 

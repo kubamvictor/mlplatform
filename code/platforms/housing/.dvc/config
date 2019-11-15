@@ -1,0 +1,4 @@
+['remote "myremote"']
+url = ..\..\..\..\my_local_dvc_remote
+[core]
+remote = myremote

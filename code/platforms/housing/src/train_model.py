@@ -6,6 +6,10 @@ from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
 import mlflow 
 from mlflow.tracking import MlflowClient
+import neptune
+
+neptune.init('kubamvictor/sandbox',
+             api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vdWkubmVwdHVuZS5tbCIsImFwaV9rZXkiOiJlNDM2MmMxMC1iNDk2LTQ2YWMtYTE2MC1hMGZkYzJhNjZjMGUifQ==')
 
 # Set mlflow tracking uri
 # remote_server_uri = "..."
@@ -63,6 +67,8 @@ with mlflow.start_run():
     mse = metrics.mean_squared_error(y_test, y_pred) 
     rmse = np.sqrt(metrics.mean_squared_error(y_test, y_pred))
 
+    print(sum([el for el in range(50000000)]))
+
     # Normal approach
     print('Mean Absolute Error:', mae)  
     print('Mean Squared Error:', mse)  
@@ -79,3 +85,18 @@ with mlflow.start_run():
     mlflow.log_metric(key="rmse",value=rmse)
 
 # client.set_terminated(run.info.run_id) 
+
+#----------------------------------------
+# Neptune
+#----------------------------------------
+
+PARAMS = {
+    "n_estimators":5,
+    "random_state":100,
+    "min_samples_leaf":5
+}
+
+with neptune.create_experiment(name="ml_platforms",params=PARAMS):
+    neptune.log_metric("mae",mae)
+    neptune.log_metric("mse",mse)
+    neptune.log_metric("rmse",rmse)

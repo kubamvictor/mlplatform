@@ -6,10 +6,6 @@ from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
 import mlflow 
 from mlflow.tracking import MlflowClient
-import neptune
-
-neptune.init('kubamvictor/sandbox',
-             api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vdWkubmVwdHVuZS5tbCIsImFwaV9rZXkiOiJlNDM2MmMxMC1iNDk2LTQ2YWMtYTE2MC1hMGZkYzJhNjZjMGUifQ==')
 
 # Set mlflow tracking uri
 # remote_server_uri = "..."
@@ -17,31 +13,11 @@ neptune.init('kubamvictor/sandbox',
 
 # set experiment
 experiment_name = "my-experiment"
-mlflow.set_experiment(experiment_name)
-
-def get_experiment_id(experiment_name):
-    """
-    function to retrive experiment id given experiment name
-    """
-    from mlflow.tracking import MlflowClient
-    client = MlflowClient()
-    try:
-        exp_id = [exp.experiment_id for exp in client.list_experiments() if exp.name == experiment_name][0]
-        print("Experiment found!")
-        print("Returning experiment id.....")
-        print("Experiment_id: {}".format(exp_id))
-    except Exception as e:
-        print("Experiment not found! {}".format(e))
-        pass
-    return exp_id
-
-# mlflow client
-# client = MlflowClient()
-# run = client.create_run(get_experiment_id(experiment_name)) # run Start:
 
 # Get system arguments
 
 with mlflow.start_run():
+    mlflow.set_experiment(experiment_name)
     train_datafile, test_datafile = sys.argv[1],sys.argv[2] if len(sys.argv) > 2 else print(" No input for train and test files")
 
     train_df = pd.read_csv(train_datafile,sep=",")
@@ -84,19 +60,3 @@ with mlflow.start_run():
     mlflow.log_metric(key="mse",value=mse)
     mlflow.log_metric(key="rmse",value=rmse)
 
-# client.set_terminated(run.info.run_id) 
-
-#----------------------------------------
-# Neptune
-#----------------------------------------
-
-PARAMS = {
-    "n_estimators":5,
-    "random_state":100,
-    "min_samples_leaf":5
-}
-
-with neptune.create_experiment(name="ml_platforms",params=PARAMS):
-    neptune.log_metric("mae",mae)
-    neptune.log_metric("mse",mse)
-    neptune.log_metric("rmse",rmse)

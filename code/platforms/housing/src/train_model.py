@@ -43,8 +43,6 @@ with mlflow.start_run():
     mse = metrics.mean_squared_error(y_test, y_pred) 
     rmse = np.sqrt(metrics.mean_squared_error(y_test, y_pred))
 
-    print(sum([el for el in range(50000000)]))
-
     # Normal approach
     print('Mean Absolute Error:', mae)  
     print('Mean Squared Error:', mse)  
